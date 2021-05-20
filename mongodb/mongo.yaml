@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: log
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  namespace: log
+spec:
+  selector:
+    matchLabels:
+      app: mongo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+        - name: mongo
+          image: 'harbor.base-fx.com/itd/mongo:4.2.0'
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"
+          volumeMounts:
+            - name: storage-mongodb
+              mountPath: /data/db
+      volumes:
+        - name: storage-mongodb
+          hostPath:
+            path: /sw/systems/shared/graylog02/mongo
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-port
+  namespace: log
+spec:
+  type: NodePort
+  selector:
+    app: mongo
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+      nodePort: 30000

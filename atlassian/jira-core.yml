@@ -1,0 +1,21 @@
+version: '3.3'
+
+services:
+  jira-core:
+    image: harbor.base-fx.com/common/jira-core:8.4.1
+    restart: unless-stopped
+    container_name: jira-core
+    environment:
+      TZ: "Asia/Shanghai"
+      JVM_MAXIMUM_MEMORY: 2048m
+    volumes:
+      - jira_core_home:/var/atlassian/application-data/jira
+    ports:
+      - "8082:8080"
+
+volumes:
+  jira_core_home:
+    driver_opts:
+      type: "nfs"
+      o: "addr=10.14.6.159,rw,nolock,intr"
+      device: ":/mydata/docker_nfs/atlassian/jira-core"

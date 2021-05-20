@@ -1,0 +1,21 @@
+version: '3.3'
+
+services:
+  jira-core:
+    image: harbor.base-fx.com/itd/confluence:6.3.1
+    restart: unless-stopped
+    container_name: confluence
+    environment:
+      TZ: "Asia/Shanghai"
+      JVM_MAXIMUM_MEMORY: 4096m
+    volumes:
+      - confluence_home:/var/atlassian/application-data/confluence
+    ports:
+      - "8081:8090"
+
+volumes:
+  confluence_home:
+    driver_opts:
+      type: "nfs"
+      o: "addr=10.14.6.159,rw,nolock,intr"
+      device: ":/mydata/docker_nfs/atlassian/confluence"

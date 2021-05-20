@@ -1,0 +1,46 @@
+version: '3.4'
+x-defaults: &defaults
+  restart: unless-stopped
+  image: "harbor.base-fx.com/itd/sentry:8.22.0"
+  depends_on:
+    - redis
+    - postgres
+  env_file: .env
+  volumes:
+    - /sentry/etc:/etc/sentry
+    - /sentry/sentry_data:/var/lib/sentry/files
+
+services:
+  sentry-web:
+    << : *defaults
+    container_name: dvd-sentry-web
+    ports:
+      - '9000:9000'
+      
+  sentry-cron:
+    << : *defaults
+    container_name: dvd-sentry-cron
+    command: run cron
+
+
+  sentry-worker:
+    << : *defaults
+    container_name: dvd-sentry-worker
+    command: run worker
+
+  
+  redis:
+    restart: unless-stopped
+    container_name: dvd-sentry-redis
+    image: "harbor.base-fx.com/itd/redis:3.2.3"
+
+  postgres:
+    restart: unless-stopped
+    container_name: dvd-sentry-postgres
+    image: "harbor.base-fx.com/itd/postgre:9.6"
+    environment:
+      POSTGRES_USER: itd
+      POSTGRES_PASSWORD: bfx390a
+    volumes:
+      - /sentry/pgdata:/var/lib/postgresql/data
+

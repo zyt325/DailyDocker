@@ -1,0 +1,97 @@
+# my global config
+global:
+  scrape_interval:     1m # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 10s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+      - targets: 
+        - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "alert_rules.yml"
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+    - targets: ['localhost:9090']
+
+  - job_name: 'docker'
+    scrape_interval: 1m
+    static_configs:
+      # - targets: ['zhangyt.base-fx.com:9100','zhangyt.base-fx.com:9080','zhangyt.base-fx.com:9104']
+      #   labels:
+      #     group: 'zhangyt'
+      - targets: 
+        - docker01.base-fx.com:9100
+        - docker01.base-fx.com:9080
+        - docker02.base-fx.com:9100
+        - docker02.base-fx.com:9080
+        - docker03.base-fx.com:9100
+        - docker03.base-fx.com:9080
+        - docker04.base-fx.com:9100
+        - docker04.base-fx.com:9080
+        - docker05.base-fx.com:9100
+        - docker05.base-fx.com:9080
+        - docker-dev01.base-fx.com:9100
+        - docker-dev01.base-fx.com:9080
+        labels:
+          group: 'BJ'
+  
+  - job_name: 'mysql'
+    scrape_interval: 1m
+    static_configs:
+      - targets: 
+        - exporter-mysql.base-fx.com:9104
+        labels:
+          group: 'mysql'
+          service: 'db'
+          slave: 'true'
+      
+      - targets: 
+        - exporter-mysql.base-fx.com:9105
+        labels:
+          group: 'mysql'
+          service: 'dbd'
+          slave: 'true'
+      
+      - targets: 
+        - exporter-mysql.base-fx.com:9106
+        labels:
+          group: 'mysql'
+          service: 'db08'
+          slave: 'true'
+      
+      - targets: 
+        - exporter-mysql.base-fx.com:9107
+        labels:
+          group: 'mysql'
+          service: 'docker03'
+          slave: 'false'
+        
+      - targets: 
+        - exporter-mysql.base-fx.com:9108
+        labels:
+          group: 'mysql'
+          service: 'zabbix'
+          slave: 'false'
+      
+      - targets: 
+        - exporter-mysql.base-fx.com:9109
+        labels:
+          group: 'mysql'
+          service: 'db09'
+          slave: 'true'

@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: common
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: pypiserver
+  namespace: common
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pypiserver
+    spec:
+      containers:
+        - name: pypiserver
+          image: 'harbor.base-fx.com/dev/pypiserver'
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: storage-pypiserver
+              mountPath: /app/packages
+      volumes:
+        - name: storage-pypiserver
+          nfs:
+            path: /mydata/docker_nfs/pypiserver
+            server: 10.14.6.159
+#          hostPath:
+#            path: /data/pypiserver/packages
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pypiserver-port
+  namespace: common
+spec:
+  selector:
+    app: pypiserver
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 31808

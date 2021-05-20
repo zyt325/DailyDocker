@@ -1,0 +1,17 @@
+version: '3.1'
+
+services:
+  flask:
+    #build: .
+    image: harbor.base-fx.com/itd/flask:1.1.2
+    command: gunicorn -c gunicore.conf.py  main:app
+    restart: unless-stopped
+    container_name: address_book
+    environment:
+      TZ: "Asia/Shanghai"
+    volumes:
+      # - ./app:/app
+      - /docker_data/flask:/app
+    ports:
+      - "8085:5000"
+  

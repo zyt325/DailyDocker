@@ -1,0 +1,25 @@
+version: "3.1"
+
+services:
+    canal:
+        image: harbor.base-fx.com/itd/canal-server:v1.1.1
+        restart: unless-stopped
+        container_name: canal
+        environment:
+            canal.auto.scan: "false"
+            canal.destinations: "test"
+            canal.instance.master.address: 10.14.6.159:3307
+            canal.instance.defaultDatabaseName: "mysql"
+            canal.instance.dbUsername: "canal"
+            canal.instance.dbPassword: "canal"
+            canal.instance.connectionCharset: "UTF-8"
+            canal.instance.tsdb.enable: "true"
+            canal.instance.tsdb.spring.xml: "classpath:spring/tsdb/mysql-tsdb.xml"
+            #canal.instance.tsdb.dir: "${canal.file.data.dir:../conf}/${canal.instance.destination:}"
+            canal.instance.tsdb.url: "jdbc:mysql://10.14.6.159:3306/canal_tsdb"
+            canal.instance.tsdb.dbUsername: "zyt"
+            canal.instance.tsdb.dbPassword: "325"
+            canal.instance.gtidon: "false"
+            canal.instance.enableDruid: "false"
+        ports:
+            - "11111:11111"

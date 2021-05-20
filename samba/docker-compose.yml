@@ -1,0 +1,17 @@
+version: "3.1"
+
+services:
+    samba:
+        image: harbor.base-fx.com/itd/samba:centos72
+        restart: unless-stopped
+        container_name: samba
+        environment:
+            TZ: "Asia/Shanghai"
+        ports:
+            - "139:139"
+            - "445:445"
+        command: /bin/bash
+        volumes:
+            - /isilon2/ELEMENTS/misc/reference/quixel:/data
+            - /docker/samba/smb.conf:/etc/samba/smb.conf:rw
+        tty: true

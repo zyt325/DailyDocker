@@ -1,0 +1,23 @@
+version: "3.3"
+
+services:
+    jenkins:
+        image: harbor.base-fx.com/itd/jenkins:lts
+        restart: unless-stopped
+        container_name: jenkins
+        environment:
+            MYSQL_ROOT_PASSWORD: mysql325
+            JAVA_OPTS: "-Djava.util.logging.config.file=/var/jenkins_home/log.properties"
+            TZ: "Asia/Shanghai"
+        volumes:
+            - jenkins_home:/var/jenkins_home
+        ports:
+            - "8081:8080"
+            - "50000:50000"
+
+volumes:
+    jenkins_home:
+        driver_opts:
+            type: "nfs"
+            o: "addr=10.14.6.159,rw,nolock,intr"
+            device: ":/mydata/docker_nfs/jenkins"

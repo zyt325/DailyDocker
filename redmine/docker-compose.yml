@@ -1,0 +1,30 @@
+version: '3.1'
+
+services:
+  redmine:
+    image: harbor.base-fx.com/base/redmine:4.2.0
+    restart: always
+    container_name: redmine
+    ports:
+      - 3000:3000
+    environment:
+      REDMINE_DB_MYSQL: db
+      REDMINE_DB_PASSWORD: mysql325
+      REDMINE_SECRET_KEY_BASE: supersecretkey
+    volumes: 
+      - /docker_data/redmine/data:/usr/src/redmine/files
+      - /docker/redmine/configuration.yml:/usr/src/redmine/config/configuration.yml
+
+  db:
+    image: harbor.base-fx.com/itd/mariadb:10.4
+    restart: unless-stopped
+    container_name: mariadb
+    environment:
+        MYSQL_DATABASE: redmine
+        MYSQL_ROOT_PASSWORD: mysql325
+        TZ: "Asia/Shanghai"
+    volumes:
+        - /docker_data/redmine/mariadb-data:/var/lib/mysql
+        - /docker/redmine/conf:/etc/mysql/mariadb.conf.d
+    ports:
+        - "3306:3306"

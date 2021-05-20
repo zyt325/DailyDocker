@@ -1,0 +1,14 @@
+version: '3.1'
+
+services:
+  wbo:
+    image: harbor.base-fx.com/base/wbo:1.10.0
+    restart: always
+    container_name: wbo
+    volumes:
+      - /docker_data/wbo/wbo-boards:/opt/app/server-data
+    environment:
+      TZ: "Asia/Shanghai"
+    ports:
+      - 5001:8080
+  

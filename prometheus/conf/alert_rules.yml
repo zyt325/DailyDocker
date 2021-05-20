@@ -1,0 +1,33 @@
+groups:
+- name: Status   # 报警规则的名字
+  rules:
+  - alert: InstanceDown
+    expr: up == 0
+    for: 5m   # 满足告警条件持续时间多久后，才会发送告警
+    labels:
+      severity: High
+    annotations:
+      summary: "Instance {{ $labels.instance }} down"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
+
+- name: MySQL_Uptime   # 报警规则的名字
+  rules:
+  - alert: MySQL_Slave_Status_Failed
+    expr: mysql_global_status_uptime < 600
+    for: 2m   # 满足告警条件持续时间多久后，才会发送告警
+    labels:
+      severity: Warning
+    annotations:
+      summary: "Instance {{ $labels.instance }} Restart"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has been Restart."
+
+- name: MySQL_Slave_Status   # 报警规则的名字
+  rules:
+  - alert: MySQL_Slave_Status_Failed
+    expr: mysql_slave_status_slave_sql_running != 1 or mysql_slave_status_slave_sql_running != 1
+    for: 5m   # 满足告警条件持续时间多久后，才会发送告警
+    labels:
+      severity: High
+    annotations:
+      summary: "Instance {{ $labels.instance }} Failed"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has been Failed for more than 5 minutes."

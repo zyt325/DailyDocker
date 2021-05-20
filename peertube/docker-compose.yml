@@ -1,0 +1,11 @@
+version: "3.1"
+
+services:
+    peertube:
+        image: chocobozzz/peertube:latest
+        restart: unless-stopped
+        container_name: peertube
+        environment:
+            TZ: "Asia/Shanghai"
+        ports:
+            - "8020:80"

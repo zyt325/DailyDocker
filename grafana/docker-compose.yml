@@ -1,0 +1,19 @@
+version: "3.1"
+
+services:
+  grafana:
+    image: harbor.base-fx.com/itd/grafana:7.1.4
+    restart: unless-stopped
+    container_name: grafana
+    environment:
+        TZ: "Asia/Shanghai"
+        GF_SERVER_DOMAIN: "grafana.base-fx.com"
+        GF_AUTH_LDAP_ENABLED: "true"
+        GF_AUTH_LDAP_ALLOW_SIGN_UP: "true"
+        GF_AUTH_LDAP_CONFIG_FILE: "/etc/grafana/ldap.toml"
+    volumes:
+        - /docker_data/grafana/data:/var/lib/grafana
+        - /docker_data/grafana/conf/ldap.toml:/etc/grafana/ldap.toml:ro
+    ports:
+      - 3000:3000
+

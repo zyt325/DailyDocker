@@ -1,0 +1,14 @@
+version: '3.1'
+
+services:
+  wiki-db:
+    image: harbor.base-fx.com/common/mariadb:10.0.21
+    restart: unless-stopped
+    container_name: wiki-db
+    ports:
+        - "10.9.1.133:3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: basefx12
+    volumes:
+        - "/atlassian_mysql/wiki/mysql:/var/lib/mysql"
+        - "/atlassian_mysql/wiki/etc:/etc/mysql"

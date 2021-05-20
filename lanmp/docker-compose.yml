@@ -1,0 +1,49 @@
+version: "3.1"
+
+services:
+    db:
+        image: harbor.base-fx.com/itd/mariadb:10.4
+        restart: unless-stopped
+        container_name: mariadb
+        environment:
+            MYSQL_ROOT_PASSWORD: mysql325
+            TZ: "Asia/Shanghai"
+        volumes:
+            - /docker_data/base-fx/mariadb/data:/var/lib/mysql:rw
+            - /docker_data/base-fx/mariadb/etc:/etc/mysql/mariadb.conf.d:rw
+        ports:
+            - "3306:3306"
+    php:
+        image: harbor.base-fx.com/itd/php:7.3-fpm-mysql
+        restart: unless-stopped
+        container_name: php
+        environment:
+            TZ: "Asia/Shanghai"
+        depends_on:
+            - db
+        volumes:
+            - /docker_data/base-fx/php/www:/var/www/html:rw
+            - /docker_data/base-fx/php/conf/php.ini:/usr/local/etc/php/php.ini:rw
+        ports:
+            - "9000:9000"
+
+    httpd:
+        image: harbor.base-fx.com/itd/httpd:2.4.46
+        restart: unless-stopped
+        container_name: httpd
+        environment:
+            TZ: "Asia/Shanghai"
+        depends_on:
+            - php
+        volumes:
+            - /docker_data/base-fx/httpd/conf/httpd.conf:/usr/local/apache2/conf/httpd.conf:rw
+            - /docker_data/base-fx/httpd/conf/www.base-fx.com.conf:/usr/local/apache2/conf/extra/www.base-fx.com.conf:rw
+            - /docker_data/base-fx/httpd/conf/certs:/usr/local/apache2/conf/certs:rw
+            - /docker_data/base-fx/httpd/conf/certs/base-fx.com.crt:/usr/local/apache2/conf/server.crt:rw
+            - /docker_data/base-fx/httpd/conf/certs/base-fx.com.bundle:/usr/local/apache2/conf/server.csr:rw
+            - /docker_data/base-fx/httpd/conf/certs/base-fx.com.key:/usr/local/apache2/conf/server.key:rw
+            - /docker_data/base-fx/httpd/log:/usr/local/apache2/logs:rw
+            - /docker_data/base-fx/httpd/www:/usr/local/apache2/htdocs/:rw
+        ports:
+            - "80:80"
+            - "443:443"

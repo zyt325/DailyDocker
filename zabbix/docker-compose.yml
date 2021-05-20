@@ -1,0 +1,62 @@
+version: "3.1"
+
+services:
+    db:
+        image: harbor.base-fx.com/itd/mariadb:10.4
+        restart: unless-stopped
+        container_name: mariadb
+        environment:
+            MYSQL_ROOT_PASSWORD: mysql325
+            TZ: "Asia/Shanghai"
+        volumes:
+            - /docker_data/zabbix/mariadb/data:/var/lib/mysql
+            - /docker_data/zabbix/mariadb/etc:/etc/mysql/mariadb.conf.d
+        ports:
+            - "3306:3306"
+
+    zabbix-server-mysql:
+        image: harbor.base-fx.com/itd/zabbix-server-mysql:centos-5.0.2
+        restart: unless-stopped
+        container_name: zabbix-server-mysql
+        depends_on:
+            - db
+        environment:
+            TZ: "Asia/Shanghai"
+            DB_SERVER_HOST: db
+            DB_SERVER_PORT: "3306"
+            MYSQL_USER: "zabbix"
+            MYSQL_PASSWORD: "basefx12"
+            MYSQL_DATABASE: "zabbix"
+            ZBX_CACHESIZE: "2G"
+            ZBX_HISTORYCACHESIZE: "2G"
+            ZBX_HISTORYINDEXCACHESIZE: "1G"
+            ZBX_VMWARECACHESIZE: "2G"
+            ZBX_VALUECACHESIZE: "2G"
+            ZBX_TRENDCACHESIZE: "1G"
+        volumes:
+            - /docker_data/zabbix/alertscripts:/usr/lib/zabbix/alertscripts
+            - /docker_data/zabbix/externalscripts:/usr/lib/zabbix/externalscripts
+            - /docker_data/zabbix/modules:/var/lib/zabbix/modules
+        ports:
+            - "10051:10051"
+
+    zabbix-web:
+        image: harbor.base-fx.com/itd/zabbix-web-apache-mysql:centos-5.0.2
+        restart: unless-stopped
+        container_name: zabbix-web
+        depends_on:
+            - db
+        environment:
+            TZ: "Asia/Shanghai"
+            DB_SERVER_HOST: db
+            DB_SERVER_PORT: "3306"
+            MYSQL_USER: "zabbix"
+            MYSQL_PASSWORD: "basefx12"
+            MYSQL_DATABASE: "zabbix"
+            ZBX_SERVER_HOST: "zabbix-server-mysql"
+            PHP_TZ: "Asia/Shanghai"
+            ZBX_SERVER_NAME: ""
+            ZBX_MEMORYLIMIT: "1024M"
+        ports:
+            - "8080:8080"
+            - "8443:8443"

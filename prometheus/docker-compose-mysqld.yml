@@ -1,0 +1,58 @@
+version: "3.1"
+
+services:
+    mysqld-exporter-db:
+        image: harbor.base-fx.com/itd/mysqld-exporter:0.12.1
+        restart: unless-stopped
+        container_name: mysqld-exporter-db
+        environment:
+            TZ: "Asia/Shanghai"
+            DATA_SOURCE_NAME: 'monitor:Bfxmonitor@(db.base-fx.com:3306)/'
+        ports:
+            - "9104:9104"
+
+    mysqld-exporter-dbd:
+        image: harbor.base-fx.com/itd/mysqld-exporter:0.12.1
+        restart: unless-stopped
+        container_name: mysqld-exporter-dbd
+        environment:
+            TZ: "Asia/Shanghai"
+            DATA_SOURCE_NAME: 'monitor:Bfxmonitor@(dbd.base-fx.com:3306)/'
+        ports:
+            - "9105:9104"
+    mysqld-exporter-db08:
+        image: harbor.base-fx.com/itd/mysqld-exporter:0.12.1
+        restart: unless-stopped
+        container_name: mysqld-exporter-db08
+        environment:
+            TZ: "Asia/Shanghai"
+            DATA_SOURCE_NAME: 'monitor:Bfxmonitor@(db08.base-fx.com:3306)/'
+        ports:
+            - "9106:9104"
+    mysqld-exporter-docker03:
+        image: harbor.base-fx.com/itd/mysqld-exporter:0.12.1
+        restart: unless-stopped
+        container_name: mysqld-exporter-docker03
+        environment:
+            TZ: "Asia/Shanghai"
+            DATA_SOURCE_NAME: 'monitor:Bfxmonitor@(docker03.base-fx.com:3306)/'
+        ports:
+            - "9107:9104"
+    mysqld-exporter-zabbix:
+        image: harbor.base-fx.com/itd/mysqld-exporter:0.12.1
+        restart: unless-stopped
+        container_name: mysqld-exporter-zabbix
+        environment:
+            TZ: "Asia/Shanghai"
+            DATA_SOURCE_NAME: 'monitor:Bfxmonitor@(docker05.base-fx.com:3306)/'
+        ports:
+            - "9108:9104"
+    mysqld-exporter-db09:
+        image: harbor.base-fx.com/itd/mysqld-exporter:0.12.1
+        restart: unless-stopped
+        container_name: mysqld-exporter-db09
+        environment:
+            TZ: "Asia/Shanghai"
+            DATA_SOURCE_NAME: 'monitor:Bfxmonitor@(db09.base-fx.com:3306)/'
+        ports:
+            - "9109:9104"

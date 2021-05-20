@@ -1,0 +1,14 @@
+version: '3.3'
+
+services:
+  jira-software:
+    image: harbor.base-fx.com/itd/jira-software:8.10
+    restart: unless-stopped
+    container_name: jira-software
+    environment:
+      TZ: "Asia/Shanghai"
+      JVM_MAXIMUM_MEMORY: 2048m
+    volumes:
+      - /docker_data/jira-software/data:/var/atlassian/application-data/jira
+    ports:
+      - "8082:8080"

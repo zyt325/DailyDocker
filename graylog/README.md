@@ -1,0 +1,1 @@
+/data/graylog下的路径需要更改mode为777

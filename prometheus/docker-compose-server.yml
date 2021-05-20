@@ -1,0 +1,28 @@
+version: "3.1"
+
+services:
+    prometheus:
+        image: harbor.base-fx.com/itd/prometheus:2.20.1
+        restart: unless-stopped
+        container_name: prometheus
+        hostname: prometheus
+        environment:
+            TZ: "Asia/Shanghai"
+        volumes:
+            - /docker_data/prometheus/conf/prometheus.yml:/etc/prometheus/prometheus.yml
+            - /docker_data/prometheus/conf/alert_rules.yml:/etc/prometheus/alert_rules.yml
+        ports:
+            - "9090:9090"
+
+    alertmanager:
+        image: harbor.base-fx.com/itd/alertmanager:v0.21.0
+        restart: unless-stopped
+        container_name: alertmanager
+        hostname: alertmanager
+        environment:
+            TZ: "Asia/Shanghai"
+        volumes:
+            - /docker_data/prometheus/conf/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+        ports:
+            - "9093:9093"
+

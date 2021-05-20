@@ -1,0 +1,18 @@
+version: "3.4"
+
+
+x-restart-policy: &restart_policy
+  restart: unless-stopped
+x-image: &image
+  image: harbor.base-fx.com/itd/browsergapce:2.6
+
+services:
+  web:
+    <<: *image
+    <<: *restart_policy
+    security_opt:
+      - label:seccomp:chrome.json
+    ports:
+      - "8002:8002"
+    environment:
+      TZ: "Asia/Shanghai"

@@ -1,0 +1,238 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: graylog
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graylog-mongo
+  namespace: graylog
+spec:
+  selector:
+    matchLabels:
+      app: graylog-mongo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: graylog-mongo
+    spec:
+      containers:
+        - name: mongo
+          image: 'harbor.base-fx.com/common/mongo:4.2.0'
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+          volumeMounts:
+            - name: storage-graylog-mongodb
+              mountPath: /data/db
+      volumes:
+        - name: storage-graylog-mongodb
+          nfs:
+            path: /mydata/docker_nfs/graylog/mongodb
+            server: 10.14.6.159
+#          hostPath:
+#            path: /data/graylog/mongo
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: graylog-mongo-svc
+  namespace: graylog
+spec:
+  type: NodePort
+  selector:
+    app: graylog-mongo
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+      nodePort: 30000
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graylog-elasticsearch
+  namespace: graylog
+spec:
+  selector:
+    matchLabels:
+      app: graylog-elasticsearch
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: graylog-elasticsearch
+    spec:
+      containers:
+        - name: elasticsearch
+          image: 'harbor.base-fx.com/common/elasticsearch:6.8.2'
+          ports:
+            - containerPort: 9200
+              protocol: TCP
+            - containerPort: 9300
+              protocol: TCP
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"
+            - name: "discovery.type"
+              value: "single-node"
+            - name: "cluster.name"
+              value: "graylog-k8s"
+            - name: http.host
+              value: 0.0.0.0
+            - name: transport.host
+              value: localhost
+            - name: network.host
+              value: 0.0.0.0
+            - name: ES_JAVA_OPTS
+              value: '-Xms512m -Xmx1024m'
+          resources:
+            requests:
+              memory: "1024Mi"
+              cpu: "250m"
+            limits:
+              memory: "1024Mi"
+              cpu: "500m"
+          volumeMounts:
+            - name: storage-graylog-elastic
+              mountPath: /usr/share/elasticsearch/data
+      volumes:
+        - name: storage-graylog-elastic
+          nfs:
+            path: /mydata/docker_nfs/graylog/elastic
+            server: 10.14.6.159
+#          hostPath:
+#            path: /data/graylog/elasticsearch
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: graylog-elasticsearch-svc
+  namespace: graylog
+spec:
+  type: NodePort
+  selector:
+    app: graylog-elasticsearch
+  ports:
+    - protocol: TCP
+      port: 9200
+      targetPort: 9200
+      nodePort: 30001
+      name: graylog-elasticsearch-api
+    - protocol: TCP
+      port: 9300
+      targetPort: 9300
+      nodePort: 30002
+      name: graylog-elasticsearch-client
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graylog-server
+  namespace: graylog
+spec:
+  selector:
+    matchLabels:
+      app: graylog-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: graylog-server
+    spec:
+      containers:
+        - name: graylog
+          image: harbor.base-fx.com/common/graylog:3.1.2
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+            - containerPort: 12201
+              protocol: TCP
+            - containerPort: 1514
+              protocol: TCP
+            - containerPort: 12201
+              protocol: UDP
+            - containerPort: 1514
+              protocol: UDP
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"
+            - name: "GRAYLOG_HTTP_EXTERNAL_URI"
+              value: "http://10.9.3.21:30003/"
+            - name: "GRAYLOG_ELASTICSEARCH_HOSTS"
+              value: "http://graylog-elasticsearch-svc:9200/"
+            - name: "GRAYLOT_ELASTICSEARCH_DISCOVERY_ENABLED"
+              value: "true"
+            - name: "GRAYLOG_MONGODB_URI"
+              value: "mongodb://graylog-mongo-svc:27017/graylog"
+            - name: "GRAYLOG_ROOT_TIMEZONE"
+              value: "Asia/Shanghai"
+            - name: "GRAYLOG_ROOT_PASSWORD_SHA2"
+              value: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+            - name: "GRAYLOG_PASSWORD_SECRET"
+              value: "somepasswordpepper"
+          volumeMounts:
+            - name: storage-graylog-data
+              mountPath: /usr/share/graylog/data/journal
+      volumes:
+        - name: storage-graylog-data
+          nfs:
+            path: /mydata/docker_nfs/graylog/data
+            server: 10.14.6.159
+#          hostPath:
+#            path: /data/graylog/graylog
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: graylog-server-svc
+  namespace: graylog
+spec:
+  type: NodePort
+  selector:
+    app: graylog-server
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: 9000
+      nodePort: 30003
+      name: graylog-graylog-web
+    - protocol: TCP
+      port: 1514
+      targetPort: 1514
+      nodePort: 31514
+      name: graylog-graylog-syslog-tcp
+    - protocol: UDP
+      port: 1514
+      targetPort: 1514
+      nodePort: 31514
+      name: graylog-graylog-syslog-udp
+    - protocol: TCP
+      port: 12201
+      targetPort: 12201
+      nodePort: 31221
+      name: graylog-graylog-gelf-tcp
+    - protocol: UDP
+      port: 12201
+      targetPort: 12201
+      nodePort: 31221
+      name: graylog-graylog-gelf-udp
+

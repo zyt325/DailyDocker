@@ -1,0 +1,33 @@
+version: "3.1"
+
+services:
+    nginx:
+        image: harbor.base-fx.com/itd/nginx:stable
+        restart: unless-stopped
+        container_name: nginx
+        environment:
+            TZ: "Asia/Shanghai"
+        volumes:
+            - nginx-conf:/etc/nginx/conf.d
+            - nginx-log:/var/log/nginx
+            - nginx-www:/var/www
+        ports:
+            - "80:80"
+            - "443:443"
+
+volumes:
+    nginx-conf:
+        driver_opts:
+            type: "nfs"
+            o: "addr=10.14.6.159,rw,nolock,intr"
+            device: ":/mydata/docker_nfs/nginx/conf"
+    nginx-www:
+        driver_opts:
+            type: "nfs"
+            o: "addr=10.14.6.159,rw,nolock,intr"
+            device: ":/mydata/docker_nfs/nginx/www"
+    nginx-log:
+        driver_opts:
+            type: "nfs"
+            o: "addr=10.14.6.159,rw,nolock,intr"
+            device: ":/mydata/docker_nfs/nginx/log"

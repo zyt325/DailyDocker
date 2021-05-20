@@ -1,0 +1,12 @@
+version: '3.1'
+
+services:
+  supervisor:
+    image: harbor.base-fx.com/itd/supervisor:4.2.0
+    command: python binlog_parse.py
+    restart: unless-stopped
+    container_name: supervisor-binlog
+    environment:
+      TZ: "Asia/Shanghai"
+    volumes:
+      - /docker_data/binlog:/app

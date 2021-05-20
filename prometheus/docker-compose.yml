@@ -1,0 +1,34 @@
+version: "3.1"
+
+services:
+    node-exporter:
+        image: harbor.base-fx.com/itd/node-exporter:1.0.1
+        restart: unless-stopped
+        container_name: node-exporter
+        environment:
+            TZ: "Asia/Shanghai"
+            path.procfs:  /host/proc
+            path.sysfs: /host/sys
+            # collector.filesystem.ignored-mount-points: "^/(sys|proc|dev|host|etc)($|/)"
+        volumes:
+            - /proc:/host/proc
+            - /sys:/host/sys
+            - /:/rootfs
+        network_mode: host
+        ports:
+            - "9100:9100"
+
+    cadvisor:
+        image: harbor.base-fx.com/itd/cadvisor:0.33.0
+        restart: unless-stopped
+        container_name: cadvisor
+        environment:
+            TZ: "Asia/Shanghai"
+        volumes:
+            - /var/run:/var/run/:rw
+            - /sys:/sys:ro
+            - /:/rootfs:ro
+            - /var/lib/docker:/var/lib/docker:ro
+        # network_mode: host
+        ports:
+            - "9080:8080"

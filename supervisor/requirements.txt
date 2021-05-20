@@ -1,0 +1,5 @@
+setuptools==39.2.0
+wheel==0.34.2
+PyMySQL==0.9.3
+mysql-replication==0.21
+supervisor==4.2.0

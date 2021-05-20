@@ -1,0 +1,24 @@
+version: '3.5'
+services:
+  drawio:
+    image: harbor.base-fx.com/itd/draw.io:latest
+    container_name: drawio
+    restart: unless-stopped
+    ports:
+      - 8081:8080
+      - 8444:8443
+    environment:
+      PUBLIC_DNS: draw.base-fx.com
+      ORGANISATION_UNIT: Base
+      ORGANISATION: Base
+      CITY: BJ
+      STATE: state
+      COUNTRY_CODE: China
+      DRAWIO_GITLAB_URL: http://mygitlab.net
+      DRAWIO_GITLAB_ID: change_to_your_app_id
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:8080 || exit 1"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s

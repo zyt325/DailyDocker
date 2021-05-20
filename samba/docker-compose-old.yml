@@ -1,0 +1,18 @@
+version: "3.1"
+
+services:
+    samba:
+        image: harbor.base-fx.com/itd/samba:latest
+        restart: unless-stopped
+        container_name: samba
+        environment:
+            TZ: "Asia/Shanghai"
+            USER: "base;base;1000;3000;3000"
+            GROUPID: "3000"
+            PERMISSIONS: "force group = base"
+            SHARE: "quixel;/quixel;yes;no;no;all;none;base"
+        ports:
+            - "139:139"
+            - "445:445"
+        volumes:
+            - /isilon2/ELEMENTS/misc/reference/quixel:/quixel

@@ -1,0 +1,58 @@
+[[servers]]
+# Ldap server host (specify multiple hosts space separated)
+host = "pdc.base-fx.com"
+# Default port is 389 or 636 if use_ssl = true
+port = 389
+# Set to true if LDAP server supports TLS
+use_ssl = false
+# Set to true if connect LDAP server with STARTTLS pattern (create connection in insecure, then upgrade to secure connection with TLS)
+start_tls = false
+# set to true if you want to skip SSL cert validation
+ssl_skip_verify = false
+# set to the path to your root CA certificate or leave unset to use system defaults
+# root_ca_cert = "/path/to/certificate.crt"
+# Authentication against LDAP servers requiring client certificates
+# client_cert = "/path/to/client.crt"
+# client_key = "/path/to/client.key"
+
+# Search user bind dn
+bind_dn = "cn=linux_ad,cn=users,dc=ad,dc=base-fx,dc=com"
+# Search user bind password
+# If the password contains # or ; you have to wrap it with triple quotes. Ex """#password;"""
+bind_password = 'linux_ad'
+
+# User search filter, for example "(cn=%s)" or "(sAMAccountName=%s)" or "(uid=%s)"
+# Allow login from email or username, example "(|(sAMAccountName=%s)(userPrincipalName=%s))"
+search_filter = "(sAMAccountName=%s)"
+
+# An array of base dns to search through
+search_base_dns = ["ou=Basers,dc=ad,dc=base-fx,dc=com"]
+
+#group_search_filter = "(&(objectClass=group)(|(cn=ITD)(cn=PLE))(memberUid=%s))"
+#group_search_filter = "(&(objectClass=group)(memberUid=%s))"
+# group_search_filter_user_attribute = "distinguishedName"
+#group_search_filter_user_attribute = "cn"
+#group_search_base_dns = ["ou=Basers,dc=ad,dc=base-fx,dc=com"]
+
+
+# Specify names of the LDAP attributes your LDAP uses
+[servers.attributes]
+name = "givenName"
+surname = "sn"
+username = "cn"
+member_of = "memberOf"
+#member_of = "cn"
+email =  "mail"
+
+
+[[servers.group_mappings]]
+group_dn = "CN=ITD,OU=Basers,DC=ad,DC=base-fx,DC=com"
+org_role = "Admin"
+grafana_admin = true
+org_id = 1
+
+[[servers.group_mappings]]
+group_dn = "CN=PLE,OU=Basers,DC=ad,DC=base-fx,DC=com"
+org_role = "Admin"
+grafana_admin = false
+org_id = 2

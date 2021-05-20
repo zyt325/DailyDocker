@@ -1,0 +1,19 @@
+version: '3.1'
+
+services:
+  pypiserver:
+    #build: .
+    image: harbor.base-fx.com/dev/pypiserver:latest
+    container_name: pypiserver
+    restart: unless-stopped
+    volumes:
+      - testnfs:/app/packages
+    ports:
+      - "8080:8080"
+
+volumes:
+  testnfs:
+    driver_opts:
+      type: "nfs"
+      o: "addr=10.14.6.159,rw,nolock"
+      device: ":/mydata/docker_nfs/pypiserver"

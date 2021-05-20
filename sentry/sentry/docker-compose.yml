@@ -1,0 +1,66 @@
+version: '3.4'
+x-defaults: &defaults
+  restart: unless-stopped
+  image: "harbor.base-fx.com/itd/sentry-ldap:8.22.0"
+  depends_on:
+    - redis
+    - postgres
+    # - memcached
+    - smtp
+  env_file: .env
+  environment:
+    # SENTRY_MEMCACHED_HOST: memcached
+    SENTRY_REDIS_HOST: redis
+    SENTRY_POSTGRES_HOST: postgres
+    SENTRY_EMAIL_HOST: smtp
+  volumes:
+    - /sentry/etc:/etc/sentry
+    - /sentry/sentry_data:/var/lib/sentry/files
+
+services:
+  sentry-web:
+    << : *defaults
+    ports:
+      - '9000:9000'
+      
+  sentry-cron:
+    << : *defaults
+    command: run cron
+
+
+  sentry-worker:
+    << : *defaults
+    command: run worker
+
+  
+  redis:
+    restart: unless-stopped
+    image: "harbor.base-fx.com/itd/redis:3.2.3"
+    container_name: sentry-redis
+
+  # memcached:
+  #   restart: unless-stopped
+  #   image: "harbor.base-fx.com/itd/memcached:1.5.16"
+  #   container_name: sentry-memcached
+
+  postgres:
+    restart: unless-stopped
+    image: "harbor.base-fx.com/itd/postgres:9.6"
+    container_name: sentry-postgres
+    environment:
+      POSTGRES_DB: sentry
+      POSTGRES_USER: sentry
+      POSTGRES_PASSWORD: sentry
+    volumes:
+      - /sentry/pgdata:/var/lib/postgresql/data
+
+  smtp:
+    restart: unless-stopped
+    image: "harbor.base-fx.com/itd/exim4:latest"
+    container_name: sentry-smtp
+    environment:
+      GMAIL_USER: 'zhangyt@base-fx.com'
+      GMAIL_PASSWORD: '7my_9rJg'
+    volumes:
+      - /sentry/sentry-smtp:/var/spool/exim4'
+      - /sentry/sentry-smtp-log:/var/log/exim4'
